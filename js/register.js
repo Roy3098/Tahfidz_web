@@ -87,6 +87,68 @@ document.getElementById('registerFormElement').addEventListener('submit', async 
     }
 });
 
+// Handle teacher/admin registration form submission
+const teacherForm = document.getElementById('registerTeacherFormElement');
+if (teacherForm) {
+    teacherForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitButton = this.querySelector('button[type="submit"]');
+        const buttonText = submitButton.querySelector('.button-text');
+        const spinner = submitButton.querySelector('.spinner');
+
+        // Get form data
+        const formData = new FormData(this);
+        const password = formData.get('password');
+        const passwordConfirm = formData.get('password_confirm');
+
+        // Validate password confirmation
+        if (password !== passwordConfirm) {
+            showNotification('Password dan konfirmasi password tidak cocok!', 'error');
+            return;
+        }
+
+        // Show loading state
+        buttonText.textContent = 'Mendaftar...';
+        spinner.classList.remove('hidden');
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetch('api/auth.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'register_teacher',
+                    username: formData.get('username'),
+                    name: formData.get('name'),
+                    password: password,
+                    role: formData.get('role')
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification('Pendaftaran guru/admin berhasil! Mengalihkan ke halaman login...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.php';
+                }, 2000);
+            } else {
+                showNotification(data.message || 'Pendaftaran gagal. Silakan coba lagi.', 'error');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            showNotification('Terjadi kesalahan. Silakan coba lagi.', 'error');
+        } finally {
+            // Reset button state
+            buttonText.textContent = 'Daftar';
+            spinner.classList.add('hidden');
+            submitButton.disabled = false;
+        }
+    });
+}
+
 // Show notification
 function showNotification(message, type = 'info') {
     const notification = document.getElementById('notification');

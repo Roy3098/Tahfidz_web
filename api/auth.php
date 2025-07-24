@@ -20,6 +20,9 @@ if ($method === 'POST') {
         case 'register_parent':
             registerParent($pdo, $input);
             break;
+        case 'register_teacher':
+            registerTeacher($pdo, $input);
+            break;
         case 'logout':
             logout();
             break;
@@ -139,6 +142,42 @@ function registerParent($pdo, $input) {
         echo json_encode(['success' => true, 'message' => 'Pendaftaran berhasil']);
     } catch (Exception $e) {
         $pdo->rollback();
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+}
+
+function registerTeacher($pdo, $input) {
+    $username = trim($input['username'] ?? '');
+    $name = trim($input['name'] ?? '');
+    $password = $input['password'] ?? '';
+    $role = $input['role'] ?? 'teacher';
+
+    if (empty($username) || empty($name) || empty($password)) {
+        echo json_encode(['success' => false, 'message' => 'Semua field harus diisi']);
+        return;
+    }
+
+    if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $username)) {
+        echo json_encode(['success' => false, 'message' => 'Username hanya boleh huruf, angka, titik, underscore, atau strip']);
+        return;
+    }
+
+    try {
+        // Check if username already exists
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        if ($stmt->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'Username sudah terdaftar']);
+            return;
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $pdo->prepare("INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$username, $hashedPassword, $name, $role]);
+
+        echo json_encode(['success' => true, 'message' => 'Pendaftaran guru/admin berhasil']);
+    } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
 }
