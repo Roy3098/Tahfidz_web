@@ -65,6 +65,11 @@ $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
                         Kembali
                     </button>
                 </div>
+                <div class="text-center mt-2">
+                    <a href="register.php#registerTeacherForm" class="block w-full text-white text-opacity-80 py-2 font-medium hover:text-opacity-100 transition-all duration-300">
+                        Belum punya akun? Daftar Akun Guru/Admin
+                    </a>
+                </div>
             </div>
             
             <div class="text-center mt-8">
