@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$user = $_SESSION['user'];
+$user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -14,7 +14,6 @@ $user = $_SESSION['user'];
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gray-50 font-sans">
-    <div class="demo-badge">DEMO</div>
     
     <!-- Login Screen: Initial view for users to choose login type -->
     <div id="loginScreen" class="min-h-screen gradient-green flex items-center justify-center p-4 relative overflow-hidden">
